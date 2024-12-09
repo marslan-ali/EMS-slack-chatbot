@@ -67,7 +67,7 @@ slackApp.event(
   checkUserAuthorization,
   async ({ event, client, logger }) => {
     try {
-      console.log("event direct message", event);
+      console.log("event direct message");
 
       // Generate OpenAI embeddings
       const { data } = await createEmbeddings(openai, event.text);
@@ -203,7 +203,7 @@ slackApp.event(
   checkUserAuthorization,
   async ({ event, client, logger }) => {
     try {
-      console.log("event direct message", event);
+      console.log("event direct message");
 
       // Generate OpenAI embeddings
       const { data } = await createEmbeddings(openai, event.text);
@@ -276,7 +276,7 @@ slackApp.event(
   checkUserAuthorization,
   async ({ event, client, logger }) => {
     try {
-      console.log("event direct message", event);
+      console.log("event direct message");
       const db = mongoose.connection.db;
       console.log(db.databaseName, "db name");
 
