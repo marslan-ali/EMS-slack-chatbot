@@ -289,6 +289,7 @@ async function mainUsingLangChainOptimized() {
             console.log(`Document ${doc._id} updated with embeddings.`);
           } catch (docError) {
             console.error(`Error processing document ${doc._id}:`, docError);
+            throw new Error(docError);
           }
         })
       );
