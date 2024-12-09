@@ -1,0 +1,29 @@
+{
+  "name": "emschatbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "nodemon index.js",
+    "start": "node index.js",
+    "//": "comment! seed command will create the embeddings for the company policies pdf and store the vector embeddings in the astra db : https://astra.datastax.com/",
+    "seed": "node ./scripts/populateDb.js",
+    "//": "comment! embed command will create the embeddings for the EMS Payroll Collection and store the vector embeddings in each document of the Payroll collection.",
+    "embed": "node ./scripts/test.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@datastax/astra-db-ts": "^1.2.1",
+    "@langchain/mongodb": "^0.1.0",
+    "@langchain/openai": "^0.3.14",
+    "@slack/bolt": "^4.1.0",
+    "dotenv": "^16.4.5",
+    "langchain": "^0.3.6",
+    "mongodb": "^5.9.2",
+    "mongoose": "^8.8.2",
+    "nodemon": "^3.1.7",
+    "openai": "^4.72.0",
+    "pdf-parse": "^1.1.1"
+  }
+}
