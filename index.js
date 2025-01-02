@@ -130,7 +130,7 @@ slackApp.event(
   correct the spelling of message for listening the event.
 */
 slackApp.event(
-  "app_mentionn",
+  "app_mention",
   checkUserAuthorization,
   async ({ event, client, logger }) => {
     try {
