@@ -63,7 +63,7 @@ const slackApp = new App({
   correct the spelling of message for listening the event.
 */
 slackApp.event(
-  "messagee",
+  "message",
   checkUserAuthorization,
   async ({ event, client, logger }) => {
     try {
@@ -130,7 +130,7 @@ slackApp.event(
   correct the spelling of message for listening the event.
 */
 slackApp.event(
-  "app_mention",
+  "app_mentionn",
   checkUserAuthorization,
   async ({ event, client, logger }) => {
     try {
