@@ -10,7 +10,7 @@ const authorizedSlackIds = [
   "U4J0T7K3R", // Sir Arslan Ali
   "U077D3DHQJY", // Maam Aniqa
   // "U07QMUKJNAF", // Sohaib Shokat
-  // "U05QTANEK6F", // Syed Husnain Shah
+  "U05QTANEK6F", // Syed Husnain Shah
 ];
 
 module.exports = {
