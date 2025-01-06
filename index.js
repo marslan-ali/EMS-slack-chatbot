@@ -104,7 +104,7 @@ slackApp.event(
 
       const text =
         response.choices[0]?.message?.content.replaceAll("**", "*") ||
-        "Answer not found in the company policy.";
+        "I'm sorry, I don't know the answer.";
       console.log(
         "Response from OpenAI:",
         response.choices[0]?.message?.content
@@ -171,7 +171,7 @@ slackApp.event(
 
       const text =
         response.choices[0]?.message?.content.replaceAll("**", "*") ||
-        "Answer not found in the company policy.";
+        "I'm sorry, I don't know the answer.";
       console.log(
         "Response from OpenAI:",
         response.choices[0]?.message?.content
@@ -322,7 +322,7 @@ slackApp.event(
       const retriever = vectorStore.asRetriever(retrieverConfig);
 
       const prompt = PromptTemplate.fromTemplate(
-        `You are an expert assistant trained to answer questions based on payroll data(context). You can make the calculations as well according to the question.If the context provided is insufficient to answer the question, respond with: "Answer not found in EMS database.{context}
+        `You are an expert assistant trained to answer questions based on payroll data(context). You can make the calculations as well according to the question.If the context provided is insufficient to answer the question, respond with: "I'm sorry, I don't know the answer to this question.{context}
         Question: {question}`
       );
 
