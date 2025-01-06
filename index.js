@@ -104,7 +104,7 @@ slackApp.event(
 
       const text =
         response.choices[0]?.message?.content.replaceAll("**", "*") ||
-        "I'm sorry, I don't know the answer.";
+        "Answer not found in the company policy.";
       console.log(
         "Response from OpenAI:",
         response.choices[0]?.message?.content
