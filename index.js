@@ -171,7 +171,7 @@ slackApp.event(
 
       const text =
         response.choices[0]?.message?.content.replaceAll("**", "*") ||
-        "I'm sorry, I don't know the answer.";
+        "Answer not found in company policy.";
       console.log(
         "Response from OpenAI:",
         response.choices[0]?.message?.content
@@ -245,7 +245,7 @@ slackApp.event(
 
       const text =
         response.choices[0]?.message?.content.replaceAll("**", "*") ||
-        "I'm sorry, I don't know the answer.";
+        "Answer not found in EMS DB.";
       console.log(
         "Response from OpenAI:",
         response.choices[0]?.message?.content
