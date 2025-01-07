@@ -45,7 +45,7 @@ const createRagPrompt = (message, docContext) => [
     role: "system",
     content: `You are a highly knowledgeable assistant providing straightforward answers based on company policies. Keep responses short, accurate, and aligned with the context. Format responses using markdown where applicable.
         ${docContext} 
-        If the answer is not provided in the context, the AI assistant will say, "I'm sorry, I don't know the answer".`,
+        If the answer is not provided in the context, the AI assistant will say, "Answer not found in company policy.".`,
   },
   { role: "user", content: message },
 ];
