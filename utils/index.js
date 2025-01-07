@@ -55,7 +55,7 @@ const createRagPromptEMS = (message, docContext) => [
     role: "system",
     content: `You are an expert assistant trained to answer questions based on payroll data. Keep responses short, accurate, and aligned with the context. Format responses using markdown where applicable.
         ${docContext} 
-        If the answer is not provided in the context, the AI assistant will say, "I'm sorry, I don't know the answer".`,
+        If the answer is not provided in the context, the AI assistant will say, "Answer not found in EMS DB.".`,
   },
   { role: "user", content: message },
 ];
