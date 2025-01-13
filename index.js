@@ -12,6 +12,7 @@ const {
   createRagPromptEMS,
   createRagPrompForDates,
   convertDateStringToQuery,
+  classifyMessage,
 } = require("./utils");
 const {
   similarityMetrics,
@@ -63,7 +64,7 @@ const slackApp = new App({
   correct the spelling of message for listening the event.
 */
 slackApp.event(
-  "message",
+  "messagee",
   checkUserAuthorization,
   async ({ event, client, logger }) => {
     try {
@@ -272,7 +273,7 @@ slackApp.event(
   USED THIS EVENT LISTENER.(currently using this one).
 */
 slackApp.event(
-  "message",
+  "messagee",
   checkUserAuthorization,
   async ({ event, client, logger }) => {
     try {
@@ -344,6 +345,128 @@ slackApp.event(
         channel: event.channel,
         thread_ts: event.thread_ts,
         text: answer,
+      });
+    } catch (error) {
+      console.error("Error handling message event:", error);
+      logger.error(error);
+    }
+  }
+);
+
+/**
+ * Handles Slack "message" events by classifying the message, processing it based on its classification,
+ * and responding to the Slack channel.
+ *
+ * Classifications:
+ * 1. **"company policy"** - Retrieves company policy info from Astra DB and generates a response using OpenAI.
+ * 2. **"EMS DB"** - Fetches payroll data from MongoDB, processes it with OpenAI, and uses a retriever to fetch relevant documents.
+ *
+ * Steps:
+ * 1. Log the received message.
+ * 2. Classify the message using OpenAI.
+ * 3. Process based on classification:
+ *    - "company policy": Perform vector search in Astra DB and generate response.
+ *    - "EMS DB": Execute payroll query in MongoDB and generate response.
+ * 4. Post the response to the Slack channel.
+ *
+ * Error handling logs any issues during processing.
+ *
+ * @param {Object} event - The Slack message event.
+ * @param {Object} client - The Slack WebClient for posting messages.
+ * @param {Object} logger - The logger for logging errors.
+ */
+slackApp.event(
+  "message",
+  checkUserAuthorization,
+  async ({ event, client, logger }) => {
+    try {
+      console.log("Received message:", event.text);
+      const classification = await classifyMessage(openai, event.text);
+      console.log("Message classification:", classification);
+
+      let responseText =
+        "The message could not be classified. Please provide more context or check the message content.";
+
+      if (classification === "company policy") {
+        const { data } = await createEmbeddings(openai, event.text);
+        const collection = await getCollection(
+          astraDb,
+          `${prefixForVectorCollections + similarityMetrics[0]}`
+        );
+
+        const cursor = collection.find(null, {
+          sort: { $vector: data[0]?.embedding },
+          limit: 5,
+        });
+
+        const documents = await cursor.toArray();
+        const docContext = createDocContext(documents);
+        const ragPrompt = createRagPrompt(event.text, docContext);
+        const response = await getResponseFromOpenAIChat(openai, ragPrompt);
+
+        responseText =
+          response.choices[0]?.message?.content.replaceAll("**", "*") ||
+          "Answer not found in company policy.";
+      } else if (classification === "EMS DB") {
+        const db = mongoose.connection.db;
+        const collection = db.collection(payrollCollection);
+
+        const embeddings = new OpenAIEmbeddings({
+          openAIApiKey: process.env.OPENAI_API_KEY,
+        });
+        const llm = new ChatOpenAI({
+          openAIApiKey: process.env.OPENAI_API_KEY,
+          temperature: 0,
+        });
+
+        const vectorStore = new MongoDBAtlasVectorSearch(embeddings, {
+          collection,
+          indexName: "vector_index", //employee_name_index
+          textKey: "embeddingText",
+          embeddingKey: "embedding",
+        });
+
+        const ragPrompt = createRagPrompForDates(event.text);
+        const preliminaryResponse = await getResponseFromOpenAIChat(
+          openai,
+          ragPrompt
+        );
+
+        const responseTextRaw =
+          preliminaryResponse.choices[0]?.message?.content;
+        const retrieverConfig = { k: 20 };
+
+        if (!responseTextRaw.includes("null")) {
+          retrieverConfig.filter = {
+            preFilter: {
+              salary_date: convertDateStringToQuery(responseTextRaw),
+            },
+          };
+        }
+
+        const retriever = vectorStore.asRetriever(retrieverConfig);
+        const prompt = PromptTemplate.fromTemplate(
+          `You are an expert assistant trained to answer questions based on payroll data(context). You can make the calculations as well according to the question. If the context provided is insufficient to answer the question, respond with: "Answer not found in EMS DB.{context}"
+          Question: {question}`
+        );
+
+        const chain = RunnableSequence.from([
+          {
+            context: retriever.pipe(formatDocumentsAsString),
+            question: new RunnablePassthrough(),
+          },
+          prompt,
+          llm,
+          new StringOutputParser(),
+        ]);
+
+        responseText = await chain.invoke(event.text);
+      }
+
+      await client.chat.postMessage({
+        channel: event.channel,
+        thread_ts: event.thread_ts,
+        text: responseText,
       });
     } catch (error) {
       console.error("Error handling message event:", error);

@@ -93,6 +93,46 @@ const convertDateStringToQuery = (dateString) => {
   return query;
 };
 
+/**
+ * Classifies a given message into one of two categories: "company policy" or "EMS DB".
+ *
+ * @param {Object} openai - The OpenAI instance used to interact with the OpenAI API.
+ * @param {string} message - The message to be classified.
+ * @returns {Promise<string>} - The classification result, either "company policy" or "EMS DB".
+ */
+const classifyMessage = async (openai, message) => {
+  const prompt = [
+    {
+      role: "system",
+      content: `
+      You are an intelligent assistant trained to classify messages into one of two categories: "company policy" or "EMS DB." Follow these instructions carefully:
+      1. Classify a message as company policy if it pertains to:
+        - Company rules, regulations, or organizational policies.
+        - Leave encashment, general guidelines, or standard procedures.
+
+      2. Classify a message as EMS DB if it involves:
+        - Employee management systems or databases.
+        - Topics such as roles, leaves, payroll, salary, or related database queries.
+
+      3. Use tone, keywords, and context to infer the category, even if the message does not explicitly mention "EMS" or "policy." Identify the underlying intent of the message.
+
+      **Examples for better understanding:**
+      - "What is the job role of?" → EMS DB
+      - "What are the working hours?" → company policy
+      - "How is leave encashment calculated?" → company policy
+      - "Can I check the leave balance in the system?" → EMS DB
+
+      Now, classify the following message:
+      "${message}"
+      `,
+    },
+    { role: "user", content: message },
+  ];
+
+  const response = await getResponseFromOpenAIChat(openai, prompt);
+  return response.choices[0].message.content.trim();
+};
+
 module.exports = {
   createOpenAiInstance,
   createAstraDbInstance,
@@ -103,4 +143,5 @@ module.exports = {
   createRagPromptEMS,
   createRagPrompForDates,
   convertDateStringToQuery,
+  classifyMessage,
 };
