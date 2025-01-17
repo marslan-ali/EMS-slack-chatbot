@@ -2,6 +2,14 @@
 
 A Slack-based chatbot powered by OpenAI's GPT-4 that provides information about company policies and payroll data using RAG (Retrieval Augmented Generation) approach.
 
+## Demo 1
+
+![Policy Query Demo](demo/chat_01.gif)
+
+## Demo 2
+
+![Payroll Query Demo](demo/chat_02.gif)
+
 ## Features
 
 ### 1. Slack Integration
@@ -48,11 +56,17 @@ A Slack-based chatbot powered by OpenAI's GPT-4 that provides information about 
 3. Configure environment variables in `.env`:
 
 OPENAI_API_KEY=your_openai_api_key
+
 SLACK_BOT_TOKEN=your_slack_bot_token
+
 SLACK_SIGNING_SECRET=your_slack_signing_secret
+
 MONGODB_URI=your_mongodb_uri
+
 ASTRA_DB_APPLICATION_TOKEN=your_astra_token
+
 ASTRA_DB_API_ENDPOINT=your_astra_endpoint
+
 ASTRA_DB_NAMESPACE=your_astra_namespace
 
 
